@@ -264,9 +264,15 @@ def tensor_map(
         in_shape: Shape,
         in_strides: Strides,
     ) -> None:
-        # TODO: Implement for Task 2.3.
-        raise NotImplementedError('Need to implement for Task 2.3')
-
+        size_o = int(operators.prod(out_shape))
+        id_o = [0] * len(out_shape)
+        id_i = [0] * len(in_shape)
+        for i in range(size_o):
+            to_index(i, out_shape, id_o)
+            pos_o = index_to_position(id_o, out_strides)
+            broadcast_index(id_o, out_shape, in_shape, id_i)
+            pos_i = index_to_position(id_i, in_strides)
+            out[pos_o] = fn(in_storage[pos_i])
     return _map
 
 
@@ -309,9 +315,18 @@ def tensor_zip(
         b_shape: Shape,
         b_strides: Strides,
     ) -> None:
-        # TODO: Implement for Task 2.3.
-        raise NotImplementedError('Need to implement for Task 2.3')
-
+        siz_o = int(operators.prod(out_shape))
+        id_o = [0] * len(out_shape)
+        id_a = [0] * len(a_shape)
+        id_b = [0] * len(b_shape)
+        for i in range(siz_o):
+            to_index(i, out_shape, id_o)
+            pos_o = index_to_position(id_o, out_strides)
+            broadcast_index(id_o, out_shape, a_shape, id_a)
+            pos_a = index_to_position(id_a, a_strides)
+            broadcast_index(id_o, out_shape, b_shape, id_b)
+            pos_b = index_to_position(id_b, b_strides)
+            out[pos_o] = fn(a_storage[pos_a], b_storage[pos_b])
     return _zip
 
 
@@ -340,9 +355,14 @@ def tensor_reduce(
         a_strides: Strides,
         reduce_dim: int,
     ) -> None:
-        # TODO: Implement for Task 2.3.
-        raise NotImplementedError('Need to implement for Task 2.3')
-
+        siz_o = int(operators.prod(out_shape))
+        id_o = [0] * len(out_shape)
+        for i in range(siz_o):
+            to_index(i, out_shape, id_o)
+            for j in range(a_shape[reduce_dim]):
+                id_o[reduce_dim] = j
+                pos_a = index_to_position(id_o, a_strides)
+                out[i] = fn(a_storage[pos_a], out[i])
     return _reduce
 
 
